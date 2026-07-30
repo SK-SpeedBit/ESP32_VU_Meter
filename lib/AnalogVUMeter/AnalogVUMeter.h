@@ -21,7 +21,7 @@
 
 class AnalogVUMeter {
 public:
-    bool     enabled             =    true;
+    bool     enabled             =       false;
 
     // Background
     uint16_t backgroundColor     =   TFT_BLUE ;    //0xb5aa;  // Background color or more precisely - coloring the background image
@@ -82,10 +82,12 @@ public:
     TFT_eSPI& getTft() { return *tft; }                                         // Return TFT_eSPI object
 
     void  begin(TFT_eSPI &tftRef);                                              // Sets parameters and draws initial state - adc_handle will be useful when switching VU meters
-    void  loop();                                                               // Responsible for reading, FFT and drawing results
+    void  loop();                                                               // Responsible for reading, FFT and drawing results (takes about 9 ms)
 
     // Save the background after you've drawn everything you need. 
     // The program uses this to refresh the drawing under the needle.
+    // Using this function is necessary after drawing all the background elements. 
+    // Without it, the needle will not be drawn correctly.
     void  saveBackground();                                                     // Saves the background - Call when you've drawn everything on the screen!
     void  restoreBackground();                                                  // Restores the background
 
@@ -149,8 +151,8 @@ private:
 
     TFT_eSPI    *tft                            = nullptr;                      // TFT_eSPI object 
     TFT_eSprite *imgBuffer                      = nullptr;                      // Background coloring and dithering buffer
-    static inline uint16_t* screenBackupBuffer  = nullptr;                      // Background image copy buffer (screen shadow)
-    static inline bool tft_initialized          =   false;                      // TFT_eSPI initialized flag
+    uint16_t*    screenBackupBuffer             = nullptr;                      // Background image copy buffer (screen shadow)
+    static inline    bool tft_initialized       =   false;                      // TFT_eSPI initialized flag
 
     // Auxiliary variables
     float smoothProgress                        =    0.0f;                      // Smooth progress

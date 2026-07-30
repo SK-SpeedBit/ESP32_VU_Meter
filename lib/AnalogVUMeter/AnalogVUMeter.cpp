@@ -7,14 +7,13 @@
 #include "..\..\include\config.h"
 
 
-AnalogVUMeter::AnalogVUMeter()
-    : enabled(true)
-{
-   
+AnalogVUMeter::AnalogVUMeter() {
+    ;
 }
 
 AnalogVUMeter::~AnalogVUMeter() {
-    if (imgBuffer != nullptr) delete(imgBuffer);
+    if (imgBuffer          != nullptr) delete(imgBuffer);
+    if (screenBackupBuffer != nullptr) delete(screenBackupBuffer);
 }
 
 
@@ -64,9 +63,21 @@ void AnalogVUMeter::begin(TFT_eSPI &tftRef) {
         tft->init();
         tft->setRotation(1); 
         tft->fillScreen(TFT_BLACK);
+        tft->initDMA();
         tft_initialized = true;
     
         imgBuffer = new TFT_eSprite(tft);
+        screenBackupBuffer = (uint16_t*)   malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(uint16_t));
+
+        if ((screenBackupBuffer == nullptr) || (imgBuffer == nullptr)) {
+            tft->fillScreen(TFT_RED);
+            tft->setTextSize(1);                               
+            tft->setTextDatum(MC_DATUM);                       
+            tft->setTextColor(TFT_WHITE, TFT_BLACK);
+            tft->drawString("AnalogVUMeter: Insufficient RAM for buffer!", DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2); 
+            while(1); // Stop the program in case of problems
+
+        }
     }
 
 
@@ -86,6 +97,7 @@ void AnalogVUMeter::begin(TFT_eSPI &tftRef) {
 
     // last loop time
     oldLoopTime = millis();
+    enabled = true;
 }
 
 
@@ -96,20 +108,11 @@ void AnalogVUMeter::saveBackground() {
     }
     oldTileCount = 0;   // Indicate that on the first move there is nothing to write yet
 
-    //DEBUG_PRINTLN("Memory allocation for screen shadow...");
-    screenBackupBuffer = (uint16_t*)malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(uint16_t));
-
-    if (screenBackupBuffer == nullptr) {
-        tft->fillScreen(TFT_RED);
-        //DEBUG_PRINTLN("ERROR: Insufficient RAM for buffer!");
-        while(1); // Stop the program in case of problems
-    }
-    else {
-        //DEBUG_PRINTLN("Screen Mirroring (Screen Reading)...");
+    if (screenBackupBuffer != nullptr) {
         for (int y = 0; y < DISPLAY_HEIGHT; y++) {
             for (int x = 0; x < DISPLAY_WIDTH; x++) {
                 uint16_t xx =  tft->readPixel(x, y) ;
-            screenBackupBuffer[y * DISPLAY_WIDTH + x] = (xx>>8) | (xx<<8);
+                screenBackupBuffer[y * DISPLAY_WIDTH + x] = (xx>>8) | (xx<<8);
             }
         }
     }
@@ -120,6 +123,8 @@ void AnalogVUMeter::saveBackground() {
 
 void AnalogVUMeter::restoreBackground() {
     if (screenBackupBuffer != nullptr) {
+        tft->pushImage(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, screenBackupBuffer);
+/* too slow... ;-)
         //DEBUG_PRINTLN("Screen Mirroring Restore (Screen Writing)...");
         for (int y = 0; y < DISPLAY_HEIGHT; y++) {
             for (int x = 0; x < DISPLAY_WIDTH; x++) {
@@ -127,6 +132,7 @@ void AnalogVUMeter::restoreBackground() {
                 tft->drawPixel(x, y, (xx>>8) | (xx<<8));
             }
         }
+*/            
     }
 }
 
@@ -659,6 +665,7 @@ void  AnalogVUMeter::setVUScaleFont(uint8_t size) {
 
 
 void  AnalogVUMeter::loop() {
+    if (!enabled) return;
     if ((adc_owner != ADC_OWNER_ANALOG) || (adc_handle == nullptr)) return;
 
     uint8_t  result[BUFFER_SIZE] = {0};

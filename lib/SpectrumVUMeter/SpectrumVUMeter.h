@@ -22,7 +22,7 @@
 class SpectrumVUMeter {
 
 public:
-    bool     enabled                  =  true;
+    bool     enabled                  = false;
     
     uint16_t margin_left              =     2;                                // screen margin left
     uint16_t margin_right             =     2;                                // screen margin right
@@ -95,11 +95,20 @@ public:
     SpectrumVUMeter();
     ~SpectrumVUMeter();
 
-    TFT_eSPI& getTft() { return *tft; }                                       // Return TFT_eSPI object
+    TFT_eSPI& getTft() { return *tft; }                                         // Return TFT_eSPI object
 
     
-    void  begin(TFT_eSPI &tftRef);        // Sets parameters and draws initial state - adc_handle will be useful when switching VU meters
-    void  loop();                                                             // Responsible for reading, FFT and drawing results (takes about 18 ms)
+    void  begin(TFT_eSPI &tftRef);                                              // Sets parameters and draws initial state - adc_handle will be useful when switching VU meters
+    void  loop();                                                               // Responsible for reading, FFT and drawing results (takes about 18 ms)
+
+
+    // The program uses this to refresh background
+    // It's not necessary to use the saveBackground() function for this VUMeter, 
+    // but it speeds up redrawing when you add your own text, etc. 
+    // The first use of the saveBackground() function will reserve memory for the screen buffer. 
+    // If you don't use this function, no memory will be reserved.
+    void  saveBackground();                                                     // Saves the background - Call when you've drawn everything on the screen!
+    void  restoreBackground();                                                  // Restores the background
 
     void  drawString(const char *string, int32_t poX, int32_t poY, uint16_t txtColor);  
     void  drawString(const char *string, int32_t poX, int32_t poY, uint16_t txtColor, uint16_t bkgColor);
@@ -130,6 +139,7 @@ private:
 
     TFT_eSPI    *tft                   = nullptr;                             // TFT_eSPI object 
     static inline bool tft_initialized = false;                               // TFT_eSPI initialized flag
+    uint16_t*    screenBackupBuffer    = nullptr;                             // Background image copy buffer (screen shadow)
 
     float vReal[SAMPLES];                                                     // Buffer for FFT data (real) 
     float vImag[SAMPLES];                                                     // Buffer for FFT data (imaginary)
