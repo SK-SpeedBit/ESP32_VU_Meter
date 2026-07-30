@@ -16,7 +16,7 @@ If you miss the analog VU needles from old tape decks and amplifiers, you're bui
     <img src="images/video.jpg" width="40%" alt="Watch the video demonstration on YouTube">
   </a>
   <br>
-  <small><i>Click the image to watch the video demonstration on YouTube</i></small>
+  <small><i>Ctrl + Click (or Cmd + Click) the image to watch the video in a new tab</i></small>  
 </p>
 
 ---
