@@ -9,6 +9,15 @@ If you miss the analog VU needles from old tape decks and amplifiers, you're bui
   <img src="images/Spectrum.jpg" width="32%" alt="SpectrumVUMeter — spectrum analyzer">
   <img src="images/Wave.jpg" width="32%" alt="WaveVUMeter — audio waveform">
 </p>
+<br>
+
+<p align="center">
+  <a href="https://youtube.com">
+    <img src="images/video.jpg" width="40%" alt="Watch the video demonstration on YouTube">
+  </a>
+  <br>
+  <small><i>Click the image to watch the video demonstration on YouTube</i></small>
+</p>
 
 ---
 
