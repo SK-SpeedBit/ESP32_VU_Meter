@@ -12,7 +12,7 @@ If you miss the analog VU needles from old tape decks and amplifiers, you're bui
 <br>
 
 <p align="center">
-  <a href="https://youtube.com">
+  <a href="https://youtube.com" target="_blank" rel="nofollow">
     <img src="images/video.jpg" width="40%" alt="Watch the video demonstration on YouTube">
   </a>
   <br>
