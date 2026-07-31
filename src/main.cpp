@@ -29,7 +29,7 @@ WaveVUMeter     wvu;
 void setup() {
     Serial.begin(115200);
 
-
+    // -----------------------------------------------------------------------------------------------
     // Full init analog VU meter
     // Using this saveBackground() function is necessary (!) after drawing all the background elements. 
     // Without it, the needle will not be drawn correctly.
@@ -47,14 +47,18 @@ void setup() {
 
     avu.scale_MinorWidth = 1;
     avu.scale_MajorWidth = 2;
+
+    avu.scale_ValMax = 3;
+    avu.scale_ValMin = -20;
+
     avu.setVUScaleFont(2);
     avu.scale_SysFontSize = 1;
     avu.drawScale();
 
    
+    avu.text_Color =TFT_BLACK;
     avu.setVUTextFont(2);
     avu.text_SysTextFontSize = 1;
-    avu.text_Color =TFT_BLACK;
     avu.drawText("POWER OUTPUT"        , 160,  25);
     
     avu.text_Color =TFT_BLACK;
@@ -63,11 +67,11 @@ void setup() {
     avu.drawText("VU METER by SpeedBit", 160, 175);
 
     avu.drawRotateCircle();
-    avu.saveBackground();
+
+    avu.saveBackground(); // (!)
     avu.drawNeedle(0.0);
 
-
-
+    // -----------------------------------------------------------------------------------------------
     // Full init spectrum VU meter
     // We create permanent background elements and save them to memory
     // It's not necessary to use the saveBackground() function for this pointer, 
@@ -80,7 +84,7 @@ void setup() {
     tft.drawLine(0, 240 - svu.margin_bottom, 320, 240 - svu.margin_bottom, 0x4208);
     svu.saveBackground();
 
-
+    // -----------------------------------------------------------------------------------------------
     // Full init wave VU meter
     wvu.begin(tft);
 
@@ -92,6 +96,7 @@ void loop() {
     avu.loop();
     svu.loop();
     wvu.loop();
+
 
     // Analog VU Meter
     if (((millis() - oldSwitchTime) > SWITCH_TIME) && (currentTypeVUM == ANALOG_VUM)) {
