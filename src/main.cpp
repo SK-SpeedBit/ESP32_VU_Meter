@@ -34,11 +34,34 @@ void setup() {
     // Using this saveBackground() function is necessary (!) after drawing all the background elements. 
     // Without it, the needle will not be drawn correctly.
     avu.begin(tft);
-    //avu.drawBackground();
-    avu.fillScreen(0x0002);
+    //avu.backgroundColor = 0xb5aa;
+    avu.scale_Color     = TFT_BLACK;
+    avu.scale_ColorHLevel = 0x8000;
+    
+    avu.needle_Color    = TFT_RED;
+    avu.needle_Width    = 1;
+
+    avu.drawBackground();
+    // or
+    //avu.fillScreen(TFT_BLUE);
+
+    avu.scale_MinorWidth = 1;
+    avu.scale_MajorWidth = 2;
+    avu.setVUScaleFont(2);
+    avu.scale_SysFontSize = 1;
     avu.drawScale();
-    avu.drawString("POWER OUTPUT"        , 160,  50, 0x528a);
-    avu.drawString("UV METER by SpeedBit", 160, 180, 0x39c7);
+
+   
+    avu.setVUTextFont(2);
+    avu.text_SysTextFontSize = 1;
+    avu.text_Color =TFT_BLACK;
+    avu.drawText("POWER OUTPUT"        , 160,  25);
+    
+    avu.text_Color =TFT_BLACK;
+    avu.setVUTextFont(1);
+    avu.text_SysTextFontSize = 1;
+    avu.drawText("VU METER by SpeedBit", 160, 175);
+
     avu.drawRotateCircle();
     avu.saveBackground();
     avu.drawNeedle(0.0);
@@ -52,7 +75,7 @@ void setup() {
     // The first use of the saveBackground() function will reserve memory for the screen buffer. 
     // If you don't use this function, no memory will be reserved.
     svu.begin(tft);
-    svu.drawTopMarginText("Spectrum analyzer", 15, TFT_DARKGREY);
+    svu.drawTopMarginText("Spectrum analyzer by SpeedBit", 15, TFT_DARKGREY);
     tft.drawLine(0, svu.margin_top, 320, svu.margin_top, 0x4208);
     tft.drawLine(0, 240 - svu.margin_bottom, 320, 240 - svu.margin_bottom, 0x4208);
     svu.saveBackground();
@@ -60,13 +83,14 @@ void setup() {
 
     // Full init wave VU meter
     wvu.begin(tft);
+
 }
 
 
 
 void loop() {
-    svu.loop();
     avu.loop();
+    svu.loop();
     wvu.loop();
 
     // Analog VU Meter
@@ -82,6 +106,7 @@ void loop() {
     if ( ((millis() - oldSwitchTime) > SWITCH_TIME) && (currentTypeVUM == SPECTRUM_VUM)) {
         oldSwitchTime = millis();
         currentTypeVUM = WAVE_VUM;
+        currentTypeVUM = ANALOG_VUM;
         
         svu.begin(tft);
         svu.restoreBackground();  // Background from memory
