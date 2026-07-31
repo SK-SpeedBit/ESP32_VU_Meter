@@ -111,7 +111,6 @@ void loop() {
     if ( ((millis() - oldSwitchTime) > SWITCH_TIME) && (currentTypeVUM == SPECTRUM_VUM)) {
         oldSwitchTime = millis();
         currentTypeVUM = WAVE_VUM;
-        currentTypeVUM = ANALOG_VUM;
         
         svu.begin(tft);
         svu.restoreBackground();  // Background from memory
