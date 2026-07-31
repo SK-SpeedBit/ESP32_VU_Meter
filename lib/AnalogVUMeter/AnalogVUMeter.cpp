@@ -157,7 +157,6 @@ void AnalogVUMeter::drawBackground(uint16_t bgColor, uint16_t fgColor, uint8_t d
 
     for (int y = 0; y < DISPLAY_HEIGHT; y++) {
         for (int x = 0; x < DISPLAY_WIDTH; x++) {
-            
             // Read a 16-bit pixel (RGB565) from an array
             uint8_t byte1 = pgm_read_byte(&background_Image[pixelIndex++]);
             uint8_t byte2 = pgm_read_byte(&background_Image[pixelIndex++]);
@@ -181,6 +180,9 @@ void AnalogVUMeter::drawBackground(uint16_t bgColor, uint16_t fgColor, uint8_t d
             uint16_t finalColor = tft->alphaBlend(alpha, fgColor, bgColor, dither);
 
             // Save the finished, smoothed pixel in the line buffer
+            if ((x<7) || (x>320-7) || (y<7) || (y>195-7))
+            imgBuffer->drawPixel(x, 0, imageColor);
+            else
             imgBuffer->drawPixel(x, 0, finalColor);
         }
         // Push the line to the screen 
@@ -293,9 +295,10 @@ void AnalogVUMeter::drawScale() {
     float extendedX1 = edgeX1 + (float)scale_LineExtensionPx;
     
 
-    tft->setTextSize(1);                               
+    tft->setTextSize(scale_SysFontSize);                               
     tft->setTextDatum(MC_DATUM);                       
-    tft->loadFont(scale_Font);                    
+    if (scale_Font_Id >= 7) tft->loadFont(scale_Font);                    
+    else                    tft->setTextFont(scale_Font_Id); 
 
     bool  colorChanged = false;
     float arcZeroAngle = 0; 
@@ -373,9 +376,9 @@ void AnalogVUMeter::drawScale() {
                 yText = (float)needle_PosAxisY + (textDist * sin_a);
             }
 
-            tft->setTextColor(current_scale_color, TFT_TRANSPARENT);
-            //tft->drawString(textToDisplay, xText, yText);
-            drawString(textToDisplay.c_str(), xText, yText, scale_TextColor, scale_TextBkgColor);
+            tft->setTextColor(current_scale_color);
+            tft->drawString(textToDisplay, xText, yText);
+            //drawText(textToDisplay.c_str(), xText, yText, scale_TextColor, scale_TextBkgColor);
         }
         else {
             currentWidth = (float)scale_MinorWidth;
@@ -395,11 +398,11 @@ void AnalogVUMeter::drawScale() {
             }
         }
 
-        tft->drawWideLine(x0_f, y0_f, x1_f, y1_f, currentWidth, current_scale_color, TFT_TRANSPARENT);  
+        tft->drawWideLine(x0_f, y0_f, x1_f, y1_f, currentWidth, current_scale_color);  
         
         if (scale_HighLevelZone && (!colorChanged) && (val >= 0)) {
             current_scale_color = scale_ColorHLevel;          
-            tft->setTextColor(current_scale_color, TFT_TRANSPARENT);
+            tft->setTextColor(current_scale_color);
             if (scale_linear) {
                 zeroX = x0_f; 
             } else {
@@ -414,25 +417,25 @@ void AnalogVUMeter::drawScale() {
 
         if (scale_linear) {
             // Draw the baseline          
-            tft->drawWideLine(extendedX0, straightLineY, extendedX1, straightLineY, (float)scale_BaseArcWidth, scale_Color, TFT_TRANSPARENT);        
+            tft->drawWideLine(extendedX0, straightLineY, extendedX1, straightLineY, (float)scale_BaseArcWidth, scale_Color);      
         }
         else {
-            //tft->drawArc(scale_PosAxisX, scale_PosAxisY, scale_hLevel, scale_hLevel - scale_BaseArcWidth, arcStartAngleExtended, arcStopAngleExtended, scale_BaseLineColor, TFT_TRANSPARENT, true);        
+            //tft->drawArc(scale_PosAxisX, scale_PosAxisY, scale_hLevel, scale_hLevel - scale_BaseArcWidth, arcStartAngleExtended, arcStopAngleExtended, scale_BaseLineColor);//, TFT_TRANSPARENT, true);        
             tft->drawSmoothArc(scale_PosAxisX, scale_PosAxisY, scale_hLevel, scale_hLevel - scale_BaseArcWidth, arcStartAngleExtended, arcStopAngleExtended, scale_BaseLineColor, TFT_TRANSPARENT, true);        
         }
         // HighLevel Coloring
         if (scale_HighLevelZone && colorChanged) {
             if (scale_linear) {
                 //float edgeX1 = (float)scale_PosAxisX + ((float)scale_PosAxisX - edgeX0);
-                tft->drawWideLine(zeroX, straightLineY, extendedX1, straightLineY, (float)scale_BaseArcWidth, current_scale_color, TFT_TRANSPARENT);
+                tft->drawWideLine(zeroX, straightLineY, extendedX1, straightLineY, (float)scale_BaseArcWidth, current_scale_color);
             } else {
-                //tft->drawArc(scale_PosAxisX, scale_PosAxisY, scale_hLevel, scale_hLevel - scale_BaseArcWidth, arcZeroAngle, arcStopAngleExtended, current_scale_color, TFT_TRANSPARENT, true);
+                //tft->drawArc(scale_PosAxisX, scale_PosAxisY, scale_hLevel, scale_hLevel - scale_BaseArcWidth, arcZeroAngle, arcStopAngleExtended, current_scale_color);//, TFT_TRANSPARENT, true);
                 tft->drawSmoothArc(scale_PosAxisX, scale_PosAxisY, scale_hLevel, scale_hLevel - scale_BaseArcWidth, arcZeroAngle, arcStopAngleExtended, current_scale_color, TFT_TRANSPARENT, true);
             }
         }
     }
 
-    tft->unloadFont(); 
+    if (scale_Font_Id >= 7) tft->unloadFont(); 
 }
 
 
@@ -583,8 +586,8 @@ void AnalogVUMeter::drawNeedle(float targetProgress) {
     // STEP C: DRAWING A NEW NEEDLE
     float raw_x0 = (float)scale_PosAxisX  + (rStart * cos_new);
     float raw_y0 = (float)needle_PosAxisY + (rStart * sin_new);
-    float raw_x1 = (float)scale_PosAxisX  + (rEnd * cos_new);
-    float raw_y1 = (float)needle_PosAxisY + (rEnd * sin_new);
+    float raw_x1 = (float)scale_PosAxisX  + (rEnd   * cos_new);
+    float raw_y1 = (float)needle_PosAxisY + (rEnd   * sin_new);
 
     // Cutting the lower part of the edge to the Y cover
     if (raw_y0 > (float)hideNeedleBelowY) raw_y0 = (float)hideNeedleBelowY;
@@ -596,7 +599,7 @@ void AnalogVUMeter::drawNeedle(float targetProgress) {
     if (raw_x1 < 0.0f) raw_x1 = 0.0f; if (raw_x1 > maxW) raw_x1 = maxW;
 
     if (raw_y0 < (float)hideNeedleBelowY || raw_y1 < (float)hideNeedleBelowY) {
-        tft->drawWideLine(raw_x0, raw_y0, raw_x1, raw_y1, (float)needle_Width, needle_Color, TFT_TRANSPARENT);
+        tft->drawWideLine(raw_x0, raw_y0, raw_x1, raw_y1, (float)needle_Width, needle_Color);//, TFT_TRANSPARENT);
     }
 
     oldTileCount    = newTileCount;
@@ -604,13 +607,14 @@ void AnalogVUMeter::drawNeedle(float targetProgress) {
 }
 
 
-void AnalogVUMeter::drawString(const char *string, int32_t poX, int32_t poY)                     { drawString(string, poX, poY, scale_TextColor, TFT_TRANSPARENT); }
-void AnalogVUMeter::drawString(const char *string, int32_t poX, int32_t poY, uint16_t txtColor)  { drawString(string, poX, poY, txtColor, TFT_TRANSPARENT); }
-void AnalogVUMeter::drawString(const char *string, int32_t poX, int32_t poY, uint16_t txtColor, uint16_t bkgColor) {
-    tft->loadFont(text_Font);           
-    tft->setTextColor(txtColor, bkgColor);
+void AnalogVUMeter::drawText(const char *string, int32_t poX, int32_t poY)                     { drawText(string, poX, poY, text_Color, TFT_TRANSPARENT); }
+void AnalogVUMeter::drawText(const char *string, int32_t poX, int32_t poY, uint16_t txtColor)  { drawText(string, poX, poY, txtColor, TFT_TRANSPARENT); }
+void AnalogVUMeter::drawText(const char *string, int32_t poX, int32_t poY, uint16_t txtColor, uint16_t bkgColor) {
+    if (text_Font_Id >= 7) tft->loadFont(text_Font);           
+    else                   tft->setTextFont(text_Font_Id);
+    tft->setTextColor(txtColor);//, bkgColor);
     tft->drawString(string, poX, poY);
-    tft->unloadFont(); // Free up RAM after drawing the shield background
+    if (text_Font_Id >= 7) tft->unloadFont(); // Free up RAM after drawing the shield background
 }
 
 
@@ -643,6 +647,7 @@ void AnalogVUMeter::setVUTextFont(uint8_t size) {
         case 16: { text_Font = Final_Frontier16; break; }
         default: text_Font = Final_Frontier10;
     }
+    text_Font_Id = size;
 }
 
 
@@ -660,6 +665,7 @@ void  AnalogVUMeter::setVUScaleFont(uint8_t size) {
         case 16: { scale_Font = Final_Frontier16; break; }
         default: scale_Font = Final_Frontier13;
     }
+    scale_Font_Id = size;
 }
 
 

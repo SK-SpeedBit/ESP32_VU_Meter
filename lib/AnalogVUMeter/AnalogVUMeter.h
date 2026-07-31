@@ -24,31 +24,36 @@ public:
     bool     enabled             =       false;
 
     // Background
-    uint16_t backgroundColor     =   TFT_BLUE ;    //0xb5aa;  // Background color or more precisely - coloring the background image
-    uint16_t foregroundColor     =   TFT_BLACK;    // Color of points for dithering
-    uint8_t  backgroundDither    =           4;    // Dither size
+    uint16_t backgroundColor     =   0xc54a;//0xac43 ;    //0xb5aa;  // Background color or more precisely - coloring the background image
+    uint16_t foregroundColor     =   0x7a81;    // Color of points for dithering np. TFT_BLACK
+    uint8_t  backgroundDither    =       10;    // Dither size
 
     // Scale - The scale looks much better when it is light in color and the background is dark.
     uint32_t scale_Color         = 0x9ca6;        // Scale color
     uint32_t scale_ColorHLevel   = TFT_RED;       // Scale color above zero
-    uint32_t scale_TextColor     = 0x9ca6;        // Text color
     uint32_t scale_TextBkgColor  = TFT_TRANSPARENT; // Background Text color
-    uint32_t scale_BaseLineColor = TFT_YELLOW;    // Scale Baseline Color
+    uint32_t scale_BaseLineColor = TFT_BLACK;    // Scale Baseline Color
+    int      scale_Font_Id       =      2;        // 0..7 - system font else font set by setVUScaleFont 
+    int      scale_SysFontSize   =      2;        // Font size for scale if use system font
+
+    uint32_t text_Color          = 0x9ca6;        // Text color
+    int      text_Font_Id        =      1;        // 0..7 - system font else font set by setVUTextFont 
+    int      text_SysTextFontSize=      2;        // Font size for text if use system font
 
     int scale_PosAxisX           =    160;        // X-axis position common to both scale and pointer
     int scale_PosAxisY           =    550;        // Y-axis position for drawing scale profile (flattening) - remember to set hLevel!
     int needle_PosAxisY          =    220;        // Y-axis position for pointer rotation and scale angles (Technics SE-A style)
-    bool scale_linear            =   true;        // Flat scale (line)
-    bool scale_linearTicks       =   true;        // flat scale description (along the lines)
+    bool scale_linear            =  false;        // Flat scale (line)
+    bool scale_linearTicks       =  false;        // flat scale description (along the lines) - when scale_linear is true
     bool scale_HighLevelZone     =   true;        // The scale has a high level area - overload
     bool scale_DrawBaseLine      =  false;        // Draw a baseline (line or arc)
 
-    int scale_hLevel             =    410;        // Base scale arc radius
-    int scale_BaseArcWidth       =      4;        // Sscale line thickness
+    int scale_hLevel             =    430;        // Base scale arc radius
+    int scale_BaseArcWidth       =      1;        // Scale line thickness
     int scale_MarginPx           =     10;        // Margin in pixels from the edge of the screen
 
-    float scale_MinorWidth       =    1.0;        // Minor pitch width
-    float scale_MajorWidth       =    2.0;        // Major pitch width
+    float scale_MinorWidth       =      2;        // Minor pitch width
+    float scale_MajorWidth       =      3;        // Major pitch width
 
     float scale_MinorLen         =   20.0;        // Minor pitch length
     float scale_MajorLen         =   50.0;        // Major pitch length
@@ -67,13 +72,12 @@ public:
     
     // Needle
     uint16_t needle_Color        = 0x8c51;        // Needle color
-    float    needle_Width        =    3.0;        // Needle thickness
-    float    needle_Smooth       =    0.5;        // Needle behavior 0-1 => 1 - fast, 0.25 smooth) => 0 - makes no sense
+    float    needle_Width        =    2.0;        // Needle thickness
+    float    needle_Smooth       =    0.6;        // Needle behavior 0-1 => 1 - fast, 0.25 smooth) => 0 - makes no sense
     float    needle_AboveScale   =   52.0;        // The tip of the needle above the scale
     bool     needleRotateCircle  =   true;        // A wheel imitating the needle rotation mechanism
     int32_t  hideNeedleBelowY    =    195;        // Lower boundary of the housing
     bool     needle_VarLength    =   true;        // variable length needle
-
 
 
     AnalogVUMeter();
@@ -106,15 +110,15 @@ public:
     // the parameter takes the value 0 - 1 (0% to 100%) -> scale the input level first!
     void  drawNeedle(float targetProgress);                                     // Draws the needle at position 0.0 - 1.0 (0% - 100%) of the scale
 
-    void  drawString(const char *string, int32_t poX, int32_t poY);             // Draws text at position
-    void  drawString(const char *string, int32_t poX, int32_t poY, uint16_t txtColor);                      // Draws text at position and in txtColor
-    void  drawString(const char *string, int32_t poX, int32_t poY, uint16_t txtColor, uint16_t bkgColor);   // Draws text at position and in txtColor and bkgColor
+    void  drawText(const char *string, int32_t poX, int32_t poY);             // Draws text at position
+    void  drawText(const char *string, int32_t poX, int32_t poY, uint16_t txtColor);                      // Draws text at position and in txtColor
+    void  drawText(const char *string, int32_t poX, int32_t poY, uint16_t txtColor, uint16_t bkgColor);   // Draws text at position and in txtColor and bkgColor
 
     void  redraw();                                                             // Draw the background from scratch with the current settings
 
     // Settings - call before begin()
-    void  setVUTextFont (uint8_t size);                                         // 8, 9, 10, 11, 12, 13, 14, 15, 16
-    void  setVUScaleFont(uint8_t size);                                         // 8, 9, 10, 11, 12, 13, 14, 15, 16
+    void  setVUTextFont (uint8_t size);                                         // (1..7 = system font), 8, 9, 10, 11, 12, 13, 14, 15, 16
+    void  setVUScaleFont(uint8_t size);                                         // (1..7 = system font), 8, 9, 10, 11, 12, 13, 14, 15, 16
 
     void  setRange(int minValue, int maxValue);                                 // Sets the scale range (minimum - maximum
 
