@@ -73,13 +73,18 @@ public:
     // Needle
     uint16_t needle_Color        = 0x8c51;        // Needle color
     float    needle_Width        =    2.0;        // Needle thickness
-    float    needle_Smooth       =    0.6;        // Needle behavior 0-1 => 1 - fast, 0.25 smooth) => 0 - makes no sense
+    float    needle_Smooth       =    0.3;        // Needle behavior 0-1 => 1 - fast, 0.25 smooth) => 0 - makes no sense
     float    needle_AboveScale   =   52.0;        // The tip of the needle above the scale
     bool     needleRotateCircle  =   true;        // A wheel imitating the needle rotation mechanism
     int32_t  hideNeedleBelowY    =    195;        // Lower boundary of the housing
     bool     needle_VarLength    =   true;        // variable length needle
 
-
+    // set the following parameters to match the background bitmap
+    uint8_t  ditherLeftMargin    = 7;
+    uint8_t  ditherRightMargin   = 7;
+    uint8_t  ditherTopMargin     = 7;
+    uint8_t  ditherBottomMargin  = 7;
+    
     AnalogVUMeter();
     ~AnalogVUMeter();
 
@@ -139,9 +144,9 @@ private:
     static constexpr uint32_t SAMPLE_FREQ       =  80000;                       // ADC sampling rate
     static constexpr uint16_t SAMPLES           =    512;                       // ADC numer of samples
     static constexpr uint32_t BUFFER_SIZE       =  (SAMPLES * 2);               // ADC buffer size
-    static constexpr uint16_t ADC_OWNER_ANALOG  =  1357;                        // ADC owner id
+    static constexpr uint16_t ADC_OWNER_ANALOG  =   1357;                       // ADC owner id
 
-    static constexpr uint8_t MIN_REDRAW_TIME    =      10;                       // Minimum time between redraws in ms
+    static constexpr uint8_t MIN_REDRAW_TIME    =      8;                       // Minimum time between redraws in ms
 
     float vReal[SAMPLES];                                                       // Buffer for FFT data (real) 
     float vImag[SAMPLES];                                                       // Buffer for FFT data (imaginary)

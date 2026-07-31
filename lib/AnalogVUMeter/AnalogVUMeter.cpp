@@ -180,10 +180,16 @@ void AnalogVUMeter::drawBackground(uint16_t bgColor, uint16_t fgColor, uint8_t d
             uint16_t finalColor = tft->alphaBlend(alpha, fgColor, bgColor, dither);
 
             // Save the finished, smoothed pixel in the line buffer
-            if ((x<7) || (x>320-7) || (y<7) || (y>195-7))
-            imgBuffer->drawPixel(x, 0, imageColor);
-            else
-            imgBuffer->drawPixel(x, 0, finalColor);
+            if (( x < ditherLeftMargin ) || 
+                ( x > DISPLAY_WIDTH - ditherRightMargin) || 
+                ( y < ditherTopMargin) || 
+                ( y > hideNeedleBelowY - ditherBottomMargin)) 
+            {
+                imgBuffer->drawPixel(x, 0, imageColor);
+            }
+            else {
+                imgBuffer->drawPixel(x, 0, finalColor);
+            }
         }
         // Push the line to the screen 
         imgBuffer->pushSprite(0, y);
@@ -599,7 +605,7 @@ void AnalogVUMeter::drawNeedle(float targetProgress) {
     if (raw_x1 < 0.0f) raw_x1 = 0.0f; if (raw_x1 > maxW) raw_x1 = maxW;
 
     if (raw_y0 < (float)hideNeedleBelowY || raw_y1 < (float)hideNeedleBelowY) {
-        tft->drawWideLine(raw_x0, raw_y0, raw_x1, raw_y1, (float)needle_Width, needle_Color);//, TFT_TRANSPARENT);
+        tft->drawWideLine(raw_x0, raw_y0, raw_x1, raw_y1, (float)needle_Width, needle_Color, TFT_TRANSPARENT);
     }
 
     oldTileCount    = newTileCount;
@@ -707,7 +713,7 @@ void  AnalogVUMeter::loop() {
             int end_bin   = bandCutoffTable[band + 1];
             int bins_in_band = end_bin - start_bin;
 
-            // RMS
+            // RMS in band
             for (int b = start_bin; b < end_bin; b++) { band_energy += vReal[b] * vReal[b]; }
             if (bins_in_band > 0) { band_energy = sqrt(band_energy / bins_in_band); }            
 
@@ -756,16 +762,16 @@ void  AnalogVUMeter::loop() {
 
         // Bar ballistics (fast jump, slow return)
         if (overallVolume > interpolatedVolume) {
-            interpolatedVolume = (interpolatedVolume * 0.1) + (overallVolume * 0.9);
+            interpolatedVolume = (interpolatedVolume * 0.10) + (overallVolume * 0.90);
         } else {
-            interpolatedVolume = (interpolatedVolume * 0.93) + (overallVolume * 0.07);
+            interpolatedVolume = (interpolatedVolume * 0.95) + (overallVolume * 0.05);
         }
        
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
         
         // Draw results...
         if (nowTime - lastTftWriteTime >= MIN_REDRAW_TIME) {
-            drawNeedle( interpolatedVolume  );
+            drawNeedle( overallVolume  );
             lastTftWriteTime = nowTime;
         }
     }
