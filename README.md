@@ -5,7 +5,9 @@
 If you miss the analog VU needles from old tape decks and amplifiers, you're building your own amp, a DIY headphone enclosure, or you simply want your audio project to *look* as good as it sounds — this project is for you. All the rendering logic, signal smoothing and FFT processing is ready to go — you just tune the look and feed it an audio signal.
 
 <p align="center">
-  <img src="images/Analog.jpg" width="32%" alt="AnalogVUMeter — analog VU needle">
+  <img src="images/Analog.jpg" width="32%" alt="AnalogVUMeter — analog VU needle 1">
+  <img src="images/Analog2.jpg" width="32%" alt="AnalogVUMeter — analog VU needle 2">
+  <img src="images/Analog3.jpg" width="32%" alt="AnalogVUMeter — analog VU needle 3">
   <img src="images/Spectrum.jpg" width="32%" alt="SpectrumVUMeter — spectrum analyzer">
   <img src="images/Wave.jpg" width="32%" alt="WaveVUMeter — audio waveform">
 </p>
