@@ -1,6 +1,6 @@
 # 🎛️ ESP32 VU Meter — analog, spectrum and waveform audio meters for ESP32
 
-**Three classic audio meters in one firmware project — an analog needle straight out of an 80s hi-fi amplifier, a multi-band spectrum analyzer, and an oscilloscope-style waveform display — all running on a single ESP32 and an ILI9341 display, at a smooth up tp 100 FPS thanks to hardware ADC continuous mode and on-the-fly FFT.**
+**Three classic audio meters in one firmware project — an analog needle straight out of an 80s hi-fi amplifier, a multi-band spectrum analyzer, and an oscilloscope-style waveform display — all running on a single ESP32 and an ILI9341 display, at a smooth up tp 50-100 FPS thanks to hardware ADC continuous mode and on-the-fly FFT.**
 
 If you miss the analog VU needles from old tape decks and amplifiers, you're building your own amp, a DIY headphone enclosure, or you simply want your audio project to *look* as good as it sounds — this project is for you. All the rendering logic, signal smoothing and FFT processing is ready to go — you just tune the look and feed it an audio signal.
 
@@ -27,6 +27,10 @@ If you miss the analog VU needles from old tape decks and amplifiers, you're bui
   <small><i>Ctrl + Click (or Cmd + Click) the image to watch the video in a new tab</i></small>  
 </p>
 
+<p align="center">
+  <img src="images/Teleplot.png" width="100%" alt="Teleplot - timing">
+   <small><i>Drawing times for individual types of VU meters - respectively: Analog, Spectrum, Wave</i></small>  
+</p>
 ---
 
 ## ✨ What's inside
